@@ -213,6 +213,7 @@ type
     poll*: Option[Poll]
     gif*: Option[Gif]
     video*: Option[Video]
+    videos*: seq[Video]
     photos*: seq[string]
 
   Tweets* = seq[Tweet]

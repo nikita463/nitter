@@ -54,6 +54,21 @@ proc renderAlbum(tweet: Tweet): VNode =
             a(href=getOrigPicUrl(photo), class="still-image", target="_blank"):
               genImg(small)
 
+proc renderAlbum(photos: seq[string]): VNode =
+  let groups = if photos.len < 3: @[photos]
+               else: photos.distribute(2)
+  buildHtml(tdiv(class="attachments")):
+    for i, photos in groups:
+      let margin = if i > 0: ".25em" else: ""
+      tdiv(class="gallery-row", style={marginTop: margin}):
+        for photo in photos:
+          tdiv(class="attachment image"):
+            let
+              named = "name=" in photo
+              small = if named: photo else: photo & smallWebp
+            a(href=getOrigPicUrl(photo), class="still-image", target="_blank"):
+              genImg(small)
+
 proc isPlaybackEnabled(prefs: Prefs; playbackType: VideoType): bool =
   case playbackType
   of mp4: prefs.mp4Playback
@@ -323,10 +338,13 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
 
       if tweet.photos.len > 0:
         renderAlbum(tweet)
-      elif tweet.video.isSome:
+      if tweet.video.isSome:
         renderVideo(tweet.video.get(), prefs, path)
         views = tweet.video.get().views
-      elif tweet.gif.isSome:
+        # Render any additional videos
+        for video in tweet.videos:
+          renderVideo(video, prefs, path)
+      if tweet.gif.isSome:
         renderGif(tweet.gif.get(), prefs)
         views = "GIF"
 

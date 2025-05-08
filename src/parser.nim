@@ -255,20 +255,19 @@ proc parseTweet(js: JsonNode; jsCard: JsonNode = newJNull()): Tweet =
   result.expandTweetEntities(js)
 
   with jsMedia, js{"extended_entities", "media"}:
+    var isFirst = true  # Track first video for backward compatibility
     for m in jsMedia:
       case m{"type"}.getStr
       of "photo":
         result.photos.add m{"media_url_https"}.getImageStr
       of "video":
-        result.video = some(parseVideo(m))
-        with user, m{"additional_media_info", "source_user"}:
-          if user{"id"}.getInt > 0:
-            result.attribution = some(parseUser(user))
-          else:
-            result.attribution = some(parseGraphUser(user))
+        if isFirst:
+          result.video = some(parseVideo(m)) # Keep first video in main field
+          isFirst = false
+        else:
+          result.videos.add parseVideo(m) # Additional videos in sequence
       of "animated_gif":
         result.gif = some(parseGif(m))
-      else: discard
 
       with url, m{"url"}:
         if result.text.endsWith(url.getStr):
