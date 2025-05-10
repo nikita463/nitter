@@ -19,7 +19,9 @@ proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VN
         span: icon "pin", "Pinned Tweet"
     elif retweet.len > 0:
       tdiv(class="retweet-header"):
-        span: icon "retweet", retweet & " retweeted"
+        a(href=("/" & retweet)):
+          text (retweet & " retweeted")
+        # span: icon "retweet", retweet & " retweeted"
 
     tdiv(class="tweet-header"):
       a(class="tweet-avatar", href=("/" & tweet.user.username)):
@@ -309,7 +311,8 @@ proc renderTweet*(tweet: Tweet; prefs: Prefs; path: string; class=""; index=0;
   var tweet = fullTweet
   if tweet.retweet.isSome:
     tweet = tweet.retweet.get
-    retweet = fullTweet.user.fullname
+    #retweet = fullTweet.user.fullname
+    retweet = fullTweet.user.username
 
   buildHtml(tdiv(class=("timeline-item " & divClass))):
     if not mainTweet:
