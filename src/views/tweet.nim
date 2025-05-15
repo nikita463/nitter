@@ -19,7 +19,7 @@ proc renderHeader(tweet: Tweet; retweet: string; pinned: bool; prefs: Prefs): VN
         span: icon "pin", "Pinned Tweet"
     elif retweet.len > 0:
       tdiv(class="retweet-header"):
-        a(href=("/" & retweet)):
+        a(class="retweet-link", href=("/" & retweet)):
           text (retweet & " retweeted")
         # span: icon "retweet", retweet & " retweeted"
 
